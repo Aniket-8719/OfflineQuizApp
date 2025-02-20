@@ -1,25 +1,71 @@
 export const initDB = () => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('QuizDatabase', 3);
+      const request = indexedDB.open('QuizDatabase', 4);  // Incremented version to 4
   
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
         
         if (!db.objectStoreNames.contains('subjects')) {
-          const subjectsStore = db.createObjectStore('subjects', { keyPath: 'id', autoIncrement: true });
+          const subjectsStore = db.createObjectStore('subjects', { 
+            keyPath: 'id', 
+            autoIncrement: true 
+          });
           subjectsStore.createIndex('name', 'name', { unique: true });
         }
         
         if (!db.objectStoreNames.contains('attempts')) {
-          const attemptsStore = db.createObjectStore('attempts', { keyPath: 'id', autoIncrement: true });
+          const attemptsStore = db.createObjectStore('attempts', { 
+            keyPath: 'id', 
+            autoIncrement: true 
+          });
           attemptsStore.createIndex('subjectId', 'subjectId', { unique: false });
         }
       };
   
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        initializeSampleData(db).then(() => resolve(db)).catch(reject);
+      };
+  
       request.onerror = () => reject(request.error);
     });
   };
+  
+  // Initialize sample data if it doesn't exist
+  async function initializeSampleData(db) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('subjects', 'readwrite');
+      const store = tx.objectStore('subjects');
+      const nameIndex = store.index('name');
+  
+      // Check if sample quiz already exists
+      const getRequest = nameIndex.get('Sample Quiz');
+  
+      getRequest.onsuccess = (e) => {
+        if (!e.target.result) {
+          // Create sample data
+          const sampleData = {
+            name: 'Sample Quiz',
+            questions: [
+              // ... (keep the sample questions array same)
+            ],
+            createdAt: new Date()
+          };
+  
+          // Add sample data
+          const addRequest = store.add(sampleData);
+          
+          addRequest.onsuccess = () => resolve();
+          addRequest.onerror = (err) => reject(err);
+        } else {
+          resolve();
+        }
+      };
+  
+      getRequest.onerror = (err) => reject(err);
+      tx.onerror = (err) => reject(err.target.error);
+    });
+  }
   
   // Database operations
   export const db = {
