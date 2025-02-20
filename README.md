@@ -50,4 +50,4 @@ A feature-rich quiz application that allows users to create subjects, manage que
 1. **Clone the repository**
 ```bash
 git clone https://github.com/Aniket-8719/OfflineQuizApp
-cd quiz-platform
+cd OfflineQuizApp
