@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Quiz App",
+  "name": "This platform is designed for practicing MCQ questions offline. No login is required, and your data remains yours.",
   "icons": [
     {
       "src": "favicon.ico",
