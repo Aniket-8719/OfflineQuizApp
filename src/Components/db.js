@@ -38,32 +38,53 @@ export const initDB = () => {
       const store = tx.objectStore('subjects');
       const nameIndex = store.index('name');
   
-      // Check if sample quiz already exists
+      // Transaction handlers
+      tx.oncomplete = () => resolve();
+      tx.onerror = (err) => reject(err.target.error);
+  
+      // Check if sample quiz exists
       const getRequest = nameIndex.get('Sample Quiz');
   
       getRequest.onsuccess = (e) => {
         if (!e.target.result) {
-          // Create sample data
-          const sampleData = {
+          // Add sample data
+          const addRequest = store.add({
             name: 'Sample Quiz',
             questions: [
-              // ... (keep the sample questions array same)
+              {
+                text: "Which planet is closest to the Sun?",
+                options: ["Venus", "Mercury", "Earth", "Mars"],
+                correctIndex: 1
+              },
+              {
+                text: "Which data structure uses FIFO (First-In-First-Out) principle?",
+                options: ["Stack", "Queue", "Tree", "Graph"],
+                correctIndex: 1
+              },
+              {
+                text: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                correctIndex: 2
+              },
+              {
+                text: "Which language is primarily used for Android development?",
+                options: ["Swift", "Java", "C#", "Python"],
+                correctIndex: 1
+              },
+              {
+                text: "What is the chemical symbol for gold?",
+                options: ["Ag", "Fe", "Au", "Cu"],
+                correctIndex: 2
+              }
             ],
             createdAt: new Date()
-          };
+          });
   
-          // Add sample data
-          const addRequest = store.add(sampleData);
-          
-          addRequest.onsuccess = () => resolve();
           addRequest.onerror = (err) => reject(err);
-        } else {
-          resolve();
         }
       };
   
       getRequest.onerror = (err) => reject(err);
-      tx.onerror = (err) => reject(err.target.error);
     });
   }
   
