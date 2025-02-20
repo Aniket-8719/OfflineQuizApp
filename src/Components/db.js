@@ -1,3 +1,4 @@
+// Initialize the DB
 export const initDB = () => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('QuizDatabase', 4);  // Incremented version to 4
